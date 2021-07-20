@@ -240,6 +240,7 @@ int main(int argc, char *argv[])
     fpout = fopen(outfile, "w");
 
     //initialize gsl random generator
+    // unsigned int seed = time(NULL);
     unsigned int seed = 12306;
     gsl_rng *rng = gsl_rng_alloc(gsl_rng_default);
     gsl_rng_set(rng, seed);
@@ -422,56 +423,6 @@ int main(int argc, char *argv[])
                 }
 
                 //update state variables due to transmission
-                if (tot_nS_I[i] > S[i])
-                {
-                    cout << "hell01" << endl;
-                    for (int k = 0; k < nvar; k++)
-                    {
-                        nS_I[i][k] = round(nS_I[i][k] / tot_nS_I[i] * S[i]);
-                    }
-                    tot_nS_I[i] = S[i];
-                }
-
-                if (tot_nC_I[i] > C[i])
-                {
-                    cout << "hell02" << endl;
-                    for (int k = 0; k < nvar; k++)
-                    {
-                        nC_I[i][k] = round(nC_I[i][k] / tot_nC_I[i] * C[i]);
-                    }
-                    tot_nC_I[i] = C[i];
-                }
-
-                if (tot_nV0_I[i] > V0[i])
-                {
-                    cout << "hell03" << endl;
-                    for (int k = 0; k < nvar; k++)
-                    {
-                        nV0_I[i][k] = round(nV0_I[i][k] / tot_nV0_I[i] * V0[i]);
-                    }
-                    tot_nV0_I[i] = V0[i];
-                }
-
-                if (tot_nV1_I[i] > V1[i])
-                {
-                    cout << "hell04" << endl;
-                    for (int k = 0; k < nvar; k++)
-                    {
-                        nV1_I[i][k] = round(nV1_I[i][k] / tot_nV1_I[i] * V1[i]);
-                    }
-                    tot_nV1_I[i] = V1[i];
-                }
-
-                if (tot_nV2_I[i] > V2[i])
-                {
-                    cout << "hell05" << endl;
-                    for (int k = 0; k < nvar; k++)
-                    {
-                        nV2_I[i][k] = round(nV2_I[i][k] / tot_nV2_I[i] * V2[i]);
-                    }
-                    tot_nV2_I[i] = V2[i];
-                }
-
                 S[i] -= tot_nS_I[i];
                 C[i] -= tot_nC_I[i];
                 V0[i] -= tot_nV0_I[i];

@@ -30,7 +30,7 @@ argv <- c()
 argv[1:5] <- NA
 argv[1] = dout # dirName
 argv[2] = 275 # epidemic start day
-argv[3] = 2 # vaccination strategy
+argv[3] = 1 # vaccination strategy
 argv[4] = 1 # capacity of daily vaccine doses
 argv[5] = 200 # number of simulations (max nsim = 200)
 
