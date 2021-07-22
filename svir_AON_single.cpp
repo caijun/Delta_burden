@@ -325,8 +325,6 @@ int main(int argc, char *argv[])
                 }
 
                 double prob_foi = 1.0 - exp(-foi / zeta);
-                double prob_foi_ve1 = 1.0 - exp(-(1.0 - ve1) * foi / zeta);
-                double prob_foi_ve2 = 1.0 - exp(-(1.0 - ve2) * foi / zeta);
 
                 //epidemiological transitions
                 //new infections
@@ -343,11 +341,11 @@ int main(int argc, char *argv[])
                 nV1_I[i] = 0;
                 for (int j = 0; j < delay2 * zeta; j++)
                 {
-                    nV1_Imat[i][j] = gsl_ran_binomial(rng, prob_foi_ve1, V1mat[i][j]);
+                    nV1_Imat[i][j] = gsl_ran_binomial(rng, prob_foi, V1mat[i][j]);
                     nV1_I[i] += nV1_Imat[i][j];
                 }
                 //among vaccinated V2
-                nV2_I[i] = gsl_ran_binomial(rng, prob_foi_ve2, V2[i]);
+                nV2_I[i] = gsl_ran_binomial(rng, prob_foi, V2[i]);
                 //progression from infection to recovered
                 nI_R[i] = gsl_ran_binomial(rng, prob_gamma, I[i]);
 
@@ -445,8 +443,9 @@ int main(int argc, char *argv[])
             {
                 S[i] -= nS_V0[i];
                 V0[i] = V0[i] + nS_V0[i] - nV0_V1[i];
-                V1[i] = V1[i] + nV0_V1[i] - nV1_V2[i];
-                V2[i] = V2[i] + nV1_V2[i];
+                V1[i] = V1[i] + round((1 - ve1) * nV0_V1[i]) - nV1_V2[i];
+                V2[i] = V2[i] + round((1 - (ve2 - ve1)) * nV1_V2[i]);
+                R[i] = R[i] + round(ve1 * nV0_V1[i]) + round((ve2 - ve1) * nV1_V2[i]);
 
                 //update V0mat
                 for (int j = (delay1 * zeta - 1); j > 0; j--)
@@ -459,7 +458,7 @@ int main(int argc, char *argv[])
                 {
                     V1mat[i][j] = V1mat[i][j - 1];
                 }
-                V1mat[i][0] = nV0_V1[i];
+                V1mat[i][0] = round((1 - ve1) * nV0_V1[i]);
             }
 
             //check state variables

@@ -5,7 +5,7 @@ system("g++ svir_leaky_single.cpp -lgsl -o svir_leaky_single")
 
 
 library(glue)
-dout <- glue("./output/single/")
+dout <- glue("./output/single/leaky/")
 
 if(!dir.exists(dout)) {
   dir.create(dout, recursive = T)
@@ -23,7 +23,7 @@ argv[2] = 275 # epidemic start day
 argv[3] = 2 # vaccination strategy
 argv[4] = 1 # capacity of daily vaccine doses
 argv[5] = 0.8 # vaccine efficacy after 14 days of the 2nd dose
-argv[6] = 2.5 # R0
+argv[6] = 6 # R0
 argv[7] = 200 # number of simulations (max nsim = 200)
 
 t1 <- Sys.time()

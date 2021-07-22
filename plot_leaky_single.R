@@ -5,12 +5,9 @@ library(tidyverse)
 library(readr)
 library(glue)
 
-files <- list.files("output/single", full.names = T)
-file <- files[2]
+files <- list.files("output/single/leaky", pattern = "*.txt", full.names = T)
+file <- files[1]
 newI.dose.sim <- read_delim(file, delim = " ")
-
-newI.dose.sim <- newI.dose.sim %>%
-  mutate(across(everything(), as.integer))
 
 newI.gr <- newI.dose.sim %>% 
   select(sim, t, starts_with("newI."))
@@ -112,7 +109,7 @@ p1 <- ggplot(data = subset(newI.gr1, t >= Tonset)) +
   )
 p1
 
-outfile <- glue("figs/single/epi_curve_R0-{R0}_ve2-{ve2}_Tonset-{Tonset}_strategy-{strategy}_nsim-{nsim}.tif")
+outfile <- glue("figs/single/leaky/epi_curve_R0-{R0}_ve2-{ve2}_Tonset-{Tonset}_strategy-{strategy}_nsim-{nsim}.tif")
 tiff(outfile, width = 12, height = 10, unit = "in", res = 300, compression = "lzw")
 print(p1)
 dev.off()
@@ -185,7 +182,7 @@ p2 <- ggplot(data = subset(newI.gr1, t >= Tonset)) +
   )
 p2
 
-outfile <- glue("figs/single/cumI_prop_R0-{R0}_ve2-{ve2}_Tonset-{Tonset}_strategy-{strategy}_nsim-{nsim}.tif")
+outfile <- glue("figs/single/leaky/cumI_prop_R0-{R0}_ve2-{ve2}_Tonset-{Tonset}_strategy-{strategy}_nsim-{nsim}.tif")
 tiff(outfile, width = 12, height = 10, unit = "in", res = 300, compression = "lzw")
 print(p2)
 dev.off()
@@ -304,7 +301,7 @@ p3 <- ggplot(dose2.gr1) +
   )
 p3
 
-outfile <- glue("figs/single/2dose_coverage_R0-{R0}_ve2-{ve2}_Tonset-{Tonset}_strategy-{strategy}_nsim-{nsim}.tif")
+outfile <- glue("figs/single/leaky/2dose_coverage_R0-{R0}_ve2-{ve2}_Tonset-{Tonset}_strategy-{strategy}_nsim-{nsim}.tif")
 tiff(outfile, width = 12, height = 10, unit = "in", res = 300, compression = "lzw")
 print(p3)
 dev.off()
