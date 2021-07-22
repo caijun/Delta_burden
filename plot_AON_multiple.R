@@ -5,7 +5,7 @@ library(tidyverse)
 library(readr)
 library(glue)
 
-files <- list.files("output/multiple/leaky", full.names = T)
+files <- list.files("output/multiple/AON", full.names = T)
 for (file in files) {
   # file <- files[6]
   newI.dose.sim <- read_delim(file, delim = " ")
@@ -118,7 +118,7 @@ for (file in files) {
     )
   p1
   
-  outfile <- glue("figs/multiple/leaky/epi_curve_R0-{R0str}_ve2-{ve2str}_init-f-{init_fstr}_Tonset-{Tonset}_strategy-{strategy}_nsim-{nsim}.tif")
+  outfile <- glue("figs/multiple/AON/epi_curve_R0-{R0str}_ve2-{ve2str}_init-f-{init_fstr}_Tonset-{Tonset}_strategy-{strategy}_nsim-{nsim}.tif")
   tiff(outfile, width = 12, height = 10, unit = "in", res = 300, compression = "lzw")
   print(p1)
   dev.off()
@@ -237,7 +237,7 @@ for (file in files) {
     )
   p3
   
-  outfile <- glue("figs/multiple/leaky/2dose_coverage_R0-{R0str}_ve2-{ve2str}_init-f-{init_fstr}_Tonset-{Tonset}_strategy-{strategy}_nsim-{nsim}.tif")
+  outfile <- glue("figs/multiple/AON/2dose_coverage_R0-{R0str}_ve2-{ve2str}_init-f-{init_fstr}_Tonset-{Tonset}_strategy-{strategy}_nsim-{nsim}.tif")
   tiff(outfile, width = 12, height = 10, unit = "in", res = 300, compression = "lzw")
   print(p3)
   dev.off()

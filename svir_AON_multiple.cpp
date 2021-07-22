@@ -160,17 +160,6 @@ int sum(int a[], int n)
     return (sum);
 }
 
-double mean(vector<double> vector)
-{
-    int n = vector.size();
-    double average = 0.0;
-    if (n != 0)
-    {
-        average = accumulate(vector.begin(), vector.end(), 0.0) / n;
-    }
-    return (average);
-}
-
 int main(int argc, char *argv[])
 {
     //input parameters from command line
@@ -182,7 +171,6 @@ int main(int argc, char *argv[])
     //input parameters from reading files
     vector<double> ve2; //the vaccine efficacy after 14 days of the 2nd dose for wild-type and 4 variant strains; default is 80%
     ve2 = readVector("data/multiple/param/ve2", ve2);
-    double mean_ve2 = mean(ve2);
     vector<double> R0; //R0 for wild-type and 4 variant strains (alpha, beta, gamma, delta)
     R0 = readVector("data/multiple/param/R0", R0);
     vector<double> init_f; //initial fractions of wild-type and 4 variant strains
@@ -194,13 +182,12 @@ int main(int argc, char *argv[])
     int zeta = 4;
     int ni = 40;
     int ni_vec[nvar];
-    vector<double> ve1; //the vaccine efficacy right after administration of the 2nd dose. note that the vaccine efficacy after the 1st dose is 0%.
+    double ve1[nvar]; //the vaccine efficacy right after administration of the 2nd dose. note that the vaccine efficacy after the 1st dose is 0%.
     for (int i = 0; i < nvar; i++)
     {
         ni_vec[i] = round(ni * init_f[i]);
-        ve1.push_back(0.67 / 0.8 * ve2[i]);
+        ve1[i] = 0.67 / 0.8 * ve2[i];
     }
-    double mean_ve1 = mean(ve1);
     const char *variants[nvar] = {"Wild-type", "Alpha", "Beta", "Gamma", "Delta"};
 
     int ngr = 16;
@@ -221,6 +208,7 @@ int main(int argc, char *argv[])
     int V0mat[ngr][delay1 * zeta], V1mat[ngr][delay2 * zeta];
     int V0[ngr], V1[ngr], V2[ngr];
 
+    double foi[ngr][nvar];
     int newI[ngr][nvar], Rv[ngr];                                   //counter of daily number of new infections by age
     int newI_V0[ngr][nvar], newI_V1[ngr][nvar], newI_V2[ngr][nvar]; //counter of number of infected people by age with vaccine administration at each day
     int nS_I[ngr][nvar], nC_I[ngr][nvar], nI_R[ngr][nvar];
@@ -397,13 +385,13 @@ int main(int argc, char *argv[])
                 tot_nV2_I[i] = 0;
                 for (int k = 0; k < nvar; k++)
                 {
-                    double foi = 0;
+                    foi[i][k] = 0.0;
                     for (int j = 0; j < ngr; j++)
                     {
-                        foi += beta[k] * cm[i][j] * (double)I[j][k] / (double)N[j];
+                        foi[i][k] += beta[k] * cm[i][j] * (double)I[j][k] / (double)N[j];
                     }
 
-                    double prob_foi = 1.0 - exp(-foi / zeta);
+                    double prob_foi = 1.0 - exp(-foi[i][k] / zeta);
 
                     //epidemiological transitions
                     //new infections
@@ -543,9 +531,32 @@ int main(int argc, char *argv[])
             //update state variables due to vaccination
             for (int i = 0; i < ngr; i++)
             {
+                double mean_ve2 = 0.0;
+                double numerator = 0.0;
+                double denominator = 0.0;
+                for (int k = 0; k < nvar; k++)
+                {
+                    numerator += foi[i][k] * ve2[k];
+                    denominator += foi[i][k];
+                }
+
+                if (denominator > 0) // use average ve2 weighted by foi if foi is not equal to 0
+                {
+                    mean_ve2 = numerator / denominator;
+                }
+                else // use average ve2 weighted by initial fractions
+                {
+                    for (int k = 0; k < nvar; k++)
+                    {
+                        mean_ve2 += init_f[k] * ve2[k];
+                    }
+                }
+
+                double mean_ve1 = 0.67 / 0.8 * mean_ve2;
+
                 S[i] -= nS_V0[i];
                 V0[i] = V0[i] + nS_V0[i] - nV0_V1[i];
-                V1[i] = V1[i] + round((1 - mean_ve1) * nV0_V1[i]) - nV1_V2[i]; // use average ve1 weighted by foi
+                V1[i] = V1[i] + round((1 - mean_ve1) * nV0_V1[i]) - nV1_V2[i];
                 V2[i] = V2[i] + round((1 - (mean_ve2 - mean_ve1)) * nV1_V2[i]);
                 Rv[i] = Rv[i] + round(mean_ve1 * nV0_V1[i]) + round((mean_ve2 - mean_ve1) * nV1_V2[i]);
 

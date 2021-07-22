@@ -185,7 +185,6 @@ int main(int argc, char *argv[])
     for (int i = 0; i < nvar; i++)
     {
         ni_vec[i] = round(ni * init_f[i]);
-        // cout << ni_vec[i] << endl;
         ve1[i] = 0.67 / 0.8 * ve2[i];
     }
     const char *variants[nvar] = {"Wild-type", "Alpha", "Beta", "Gamma", "Delta"};
