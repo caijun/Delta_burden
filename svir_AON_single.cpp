@@ -144,6 +144,8 @@ int main(int argc, char *argv[])
     double ve2 = atof(argv[5]);   //the vaccine efficacy after 14 days of the 2nd dose; default is 80%
     double R0 = atof(argv[6]);    //R0
     int nsim = atoi(argv[7]);     //number of simulations
+    int susflag = atoi(argv[8]);  //susceptibility to infection by age (1 = heterogeneous, 2 = homogeneous)
+    int cmflag = atoi(argv[9]);   //in which period contact matrix will be used (1 = baseline, 2 = postlockdown)
 
     //set parameters
     int Tmax = 365;
@@ -186,12 +188,21 @@ int main(int argc, char *argv[])
     readVector("data/initial_immunity", ngr, prop_im); //the initial immunity by age before epidemic onset
     char path[100];
     sprintf(path, "data/doses%d", capacity);
-    doses = readVector(path, doses);                                  //daily number of doses administered
-    sus = readMatrix("data/susceptibility", nsim, ngr, sus);          //relative susceptibility by age
+    doses = readVector(path, doses); //daily number of doses administered
+    //relative susceptibility by age
+    if (susflag == 1)
+    {
+        sus = readMatrix("data/susceptibility/susceptibility_heter", nsim, ngr, sus);
+    }
+    else if (susflag == 2)
+    {
+        sus = readMatrix("data/susceptibility/susceptibility_homo", nsim, ngr, sus);
+    }
+
     vax_strategy = readMatrix("data/strategy", ngr, 3, vax_strategy); //vaccination strategy
     //output file
     char outfile[100];
-    sprintf(outfile, "%s/newI_doses_R0-%3.1lf_ve2-%.3lf_Tonset-%d_strategy-%d_nsim-%d.txt", dirName, R0, ve2, Tonset, strategy, nsim);
+    sprintf(outfile, "%s/newI_doses_R0-%3.1lf_ve2-%.3lf_Tonset-%d_strategy-%d_nsim-%d_sus-%d_cm-%d.txt", dirName, R0, ve2, Tonset, strategy, nsim, susflag, cmflag);
     FILE *fpout;
     fpout = fopen(outfile, "w");
 
@@ -202,7 +213,14 @@ int main(int argc, char *argv[])
 
     for (int sim = 0; sim < nsim; sim++) //contact matrix
     {
-        sprintf(path, "data/cm/contact_matrix%d", sim + 1);
+        if (cmflag == 1)
+        {
+            sprintf(path, "data/cm/baseline/contact_matrix%d", sim + 1);
+        }
+        else if (cmflag == 2)
+        {
+            sprintf(path, "data/cm/postlockdown/contact_matrix%d", sim + 1);
+        }
         cm = readMatrix(path, ngr, ngr, cm);
 
         for (int i = 0; i < ngr; i++)
