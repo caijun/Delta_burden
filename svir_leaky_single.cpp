@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
 {
     //input parameters
     char *dirName = argv[1];      //output directory
-    int Tonset = atoi(argv[2]);   //date index of the epidemic onset since November 30, 2020; default value is 275 (note that index is zero-based in C/C++), representing the epidemic will start at 2021-09-01
+    int Tonset = atoi(argv[2]);   //date index of the epidemic onset since November 30, 2020; default value is 336 (note that index is zero-based in C/C++), representing the epidemic will start at 2021-11-01
     int strategy = atoi(argv[3]); //vaccination strategy; candidate values are 1, 2
     int capacity = atoi(argv[4]); //the fold of maximum capacity of daily vaccine doses; candidate values are 1, 2, 3, and 4, representing 1.25, 1.5, 1.75, and 2 folds respectively
     double ve2 = atof(argv[5]);   //the vaccine efficacy after 14 days of the 2nd dose; default is 80%
@@ -146,14 +146,15 @@ int main(int argc, char *argv[])
     int nsim = atoi(argv[7]);     //number of simulations
     int susflag = atoi(argv[8]);  //susceptibility to infection by age (1 = heterogeneous, 2 = homogeneous)
     int cmflag = atoi(argv[9]);   //in which period contact matrix will be used (1 = baseline, 2 = postlockdown)
+    int ni = atoi(argv[10]);      //number of initial seed infectors
+    double gt = atof(argv[11]);   //generation time (days)
 
     //set parameters
     int Tmax = 365;
     int zeta = 4;
-    int ni = 40;
     int ngr = 16;
     int delay1 = 21, delay2 = 14;
-    double gamma = 1.0 / 7;
+    double gamma = 1.0 / gt;
     double prob_gamma = 1.0 - exp(-gamma / zeta); //probability of transition from I to R at each time step
     double ve1 = 0.67 / 0.8 * ve2;                //the vaccine efficacy right after administration of the 2nd dose. note that the vaccine efficacy after the 1st dose is 0%.
     double beta, max_eval;
@@ -163,7 +164,7 @@ int main(int argc, char *argv[])
     vector<int> doses;
     vector<vector<double>> sus(nsim, vector<double>(ngr));
     vector<vector<double>> cm(ngr, vector<double>(ngr));
-    vector<vector<int>> vax_strategy(ngr, vector<int>(3));
+    vector<vector<int>> vax_strategy(ngr, vector<int>(4));
 
     //epidemiological state variables
     int N[ngr], S[ngr], C[ngr], I[ngr], R[ngr];
@@ -199,7 +200,7 @@ int main(int argc, char *argv[])
         sus = readMatrix("data/susceptibility/susceptibility_homo", nsim, ngr, sus);
     }
 
-    vax_strategy = readMatrix("data/strategy", ngr, 3, vax_strategy); //vaccination strategy
+    vax_strategy = readMatrix("data/strategy", ngr, 4, vax_strategy); //vaccination strategy
     //output file
     char outfile[100];
     sprintf(outfile, "%s/newI_doses_R0-%3.1lf_ve2-%.3lf_Tonset-%d_strategy-%d_nsim-%d_sus-%d_cm-%d.txt", dirName, R0, ve2, Tonset, strategy, nsim, susflag, cmflag);
@@ -277,9 +278,13 @@ int main(int argc, char *argv[])
 
                     gr_vax_idx = 0;
                 }
-                else
-                { //vaccinate 18-59 and 60+ since 2021-03-29
+                else if (Td < 244)
+                { //vaccinate 18+ between 2021-03-29 and 2021-08-01
                     gr_vax_idx = 1;
+                }
+                else
+                { //vaccinate 12+ since 2021-08-01
+                    gr_vax_idx = 2;
                 }
             }
             else if (strategy == 2)
@@ -288,13 +293,17 @@ int main(int argc, char *argv[])
                 { //first vaccinate 18-59 between 2020-11-30 and 2021-03-29
                     gr_vax_idx = 0;
                 }
-                else if (Td < 275)
-                { //vaccinate 18-59 and 60+ between 2021-03-29 and 2021-09-01
+                else if (Td < 244)
+                { //vaccinate 18+ between 2021-03-29 and 2021-08-01
                     gr_vax_idx = 1;
+                }
+                else if (Td < 336)
+                { //vaccinate 12+ between 2021-08-01 and 2021-11-01
+                    gr_vax_idx = 2;
                 }
                 else
                 {
-                    gr_vax_idx = 2;
+                    gr_vax_idx = 3;
                 }
             }
 

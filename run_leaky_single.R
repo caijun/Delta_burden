@@ -19,14 +19,16 @@ if(!dir.exists(dout)) {
 argv <- c()
 argv[1:9] <- NA
 argv[1] = dout # dirName
-argv[2] = 275 # epidemic start day
+argv[2] = 336 # epidemic start day (2021-11-01)
 argv[3] = 2 # vaccination strategy
 argv[4] = 1 # capacity of daily vaccine doses
-argv[5] = 0.8 # vaccine efficacy after 14 days of the 2nd dose
+argv[5] = 0.543 # vaccine efficacy after 14 days of the 2nd dose
 argv[6] = 6 # R0
-argv[7] = 200 # number of simulations (max nsim = 200)
-argv[8] = 2 # susceptibility to infection by age (1 = heterogeneous, 2 = homogeneous)
-argv[9] = 2 # in which period contact matrix will be used (1 = baseline, 2 = postlockdown)
+argv[7] = 1 # number of simulations (max nsim = 200)
+argv[8] = 1 # susceptibility to infection by age (1 = heterogeneous, 2 = homogeneous)
+argv[9] = 1 # in which period contact matrix will be used (1 = baseline, 2 = postlockdown)
+argv[10] = 40 # number of initial seed infectors
+argv[11] = 7 # generation time (days)
 
 t1 <- Sys.time()
 
