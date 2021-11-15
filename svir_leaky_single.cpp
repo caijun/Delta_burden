@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
 {
     //input parameters
     char *dirName = argv[1];      //output directory
-    int Tonset = atoi(argv[2]);   //date index of the epidemic onset since November 30, 2020; default value is 336 (note that index is zero-based in C/C++), representing the epidemic will start at 2021-11-01
+    int Tonset = atoi(argv[2]);   //date index of the epidemic onset since November 30, 2020; default value is 366 (note that index is zero-based in C/C++), representing the epidemic will start at 2021-12-01
     int strategy = atoi(argv[3]); //vaccination strategy; candidate values are 1, 2
     int capacity = atoi(argv[4]); //the fold of maximum capacity of daily vaccine doses; candidate values are 1, 2, 3, and 4, representing 1.25, 1.5, 1.75, and 2 folds respectively
     double ve2 = atof(argv[5]);   //the vaccine efficacy after 14 days of the 2nd dose; default is 80%
@@ -203,7 +203,8 @@ int main(int argc, char *argv[])
     vax_strategy = readMatrix("data/strategy", ngr, 4, vax_strategy); //vaccination strategy
     //output file
     char outfile[100];
-    sprintf(outfile, "%s/newI_doses_R0-%3.1lf_ve2-%.3lf_Tonset-%d_strategy-%d_nsim-%d_sus-%d_cm-%d.txt", dirName, R0, ve2, Tonset, strategy, nsim, susflag, cmflag);
+    sprintf(outfile, "%s/newI_doses_R0-%3.1lf_ve2-%.3lf_Tonset-%d_strategy-%d_nsim-%d_sus-%d_cm-%d_seed-%d_gt-%3.1lf.txt", 
+    dirName, R0, ve2, Tonset, strategy, nsim, susflag, cmflag, ni, gt);
     FILE *fpout;
     fpout = fopen(outfile, "w");
 
@@ -594,13 +595,17 @@ int main(int argc, char *argv[])
     fclose(fpout);
 
     //check data and parameters
-    cout << dirName << endl;
-    cout << Tonset << endl;
-    cout << strategy << endl;
-    cout << capacity << endl;
-    cout << ve2 << endl;
-    cout << R0 << endl;
-    cout << nsim << endl;
+    cout << "outdir: " << dirName << endl;
+    cout << "epidemic starts:" << Tonset << endl;
+    cout << "vaccination strategy: " << strategy << endl;
+    cout << "fold in daily doses: " << capacity << endl;
+    cout << "vaccine efficacy: " << ve2 << endl;
+    cout << "R0: " << R0 << endl;
+    cout << "nsim: " << nsim << endl;
+    cout << "susceptibility to infection: " << susflag << endl;
+    cout << "contact matrix: " << cmflag << endl;
+    cout << "number of seed infectiors: " << ni << endl;
+    cout << "generation time: " << gt << endl;
 
     return 0;
 }
