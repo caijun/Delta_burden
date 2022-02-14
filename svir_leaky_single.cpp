@@ -298,12 +298,12 @@ int main(int argc, char *argv[])
                 { //vaccinate 18+ between 2021-03-29 and 2021-08-01
                     gr_vax_idx = 1;
                 }
-                else if (Td < 336)
-                { //vaccinate 12+ between 2021-08-01 and 2021-11-01
+                else if (Td < 332)
+                { //vaccinate 12+ between 2021-08-01 and 2021-10-28
                     gr_vax_idx = 2;
                 }
                 else
-                {
+                { //vaccinate 3+ since 2021-10-28
                     gr_vax_idx = 3;
                 }
             }
